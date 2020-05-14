@@ -8,18 +8,18 @@ import pandas as pd
 
 df = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
 
-dates = df['date'].unique()
+states = df['state'].unique()
 
-app = dash.Dash()
+app = dash.Dash(__name__)
 
 app.layout = html.Div([
 
     html.Div([
-        html.Label('Select Dates'),
+        html.Label('Select States'),
         dcc.Dropdown(
-            id='date',
-            options=[{'label': i, 'value': i} for i in dates],
-            value='2020-03-01',
+            id='state',
+            options=[{'label': i, 'value': i} for i in states],
+            value='',
             placeholder='Select...',
             multi=True
         )
@@ -27,9 +27,9 @@ app.layout = html.Div([
     style={'width': '20%', 'display': 'inline-block', 'margin-bottom': '20px'}),
 
     html.Div([
-        html.Label('Cases Reported'),
+        html.Label('Deaths Reported'),
         dcc.Slider(
-            id='cases-slider',
+            id='deaths-slider',
             min=1,
             max=3000,
             value=500,
@@ -40,32 +40,32 @@ app.layout = html.Div([
     style={'width': '20%', 'display': 'inline-block', 'margin-bottom': '20px', 'margin-left': '20px'}),
 
     html.Div([
-        dcc.Graph(id='state-vs-death'),
+        dcc.Graph(id='deaths-by-date'),
     ],
     style={'width': '95%'}),
 ])
 
 
 @app.callback(
-    dash.dependencies.Output('state-vs-death', 'figure'),
+    dash.dependencies.Output('deaths-by-date', 'figure'),
     [
-        dash.dependencies.Input('cases-slider', 'value'),
-        dash.dependencies.Input('date', 'value')
+        dash.dependencies.Input('deaths-slider', 'value'),
+        dash.dependencies.Input('state', 'value')
     ])
-def update_graph(deaths, date):
+def update_graph(deaths, state):
 
     filtered_df = df.loc[df["deaths"] > deaths]
 
-    if (date != '' and date is not None):
-        filtered_df = filtered_df[df.date.str.contains('|'.join(date))]
+    if (state != '' and state is not None):
+        filtered_df = filtered_df[df.state.str.contains('|'.join(state))]
 
     traces = []
     for i in filtered_df.state.unique():
         df_by_state = filtered_df[filtered_df['state'] == i]
         traces.append(go.Scatter(
-            x=df_by_state['state'],
+            x=df_by_state['date'],
             y=df_by_state['deaths'],
-            text=df_by_state['date'],
+            text=df_by_state['cases'],
             mode='markers',
             opacity=0.7,
             marker={
@@ -78,9 +78,9 @@ def update_graph(deaths, date):
     return {
         'data': traces,
         'layout': go.Layout(
-            xaxis={'title': 'United States', 'titlefont': dict(size=18, color='darkgrey'), 'zeroline': False, 'ticks': 'outside'},
-            yaxis={'title': 'Deaths', 'titlefont': dict(size=18, color='darkgrey'), 'range': [000, 20000], 'ticks': 'outside'},
-            margin={'l': 60, 'b': 60, 't': 30, 'r': 20},
+            xaxis={'title': 'Date', 'titlefont': dict(size=18, color='darkgrey'), 'zeroline': False, 'ticks': 'outside'},
+            yaxis={'title': 'Deaths', 'titlefont': dict(size=18, color='darkgrey'), 'range': [000, 40000], 'ticks': 'outside'},
+            margin={'l': 60, 'b': 90, 't': 30, 'r': 20},
             legend={'x': 1, 'y': 1},
             hovermode='closest'
         )
