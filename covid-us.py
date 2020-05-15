@@ -6,14 +6,16 @@ import plotly.graph_objs as go
 
 import pandas as pd
 
+# import data
 df = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
 
 states = df['state'].unique()
 
+# when using custom css, add __name__
 app = dash.Dash(__name__)
 
+# dropdown for state selection
 app.layout = html.Div([
-
     html.Div([
         html.Label('Select States'),
         dcc.Dropdown(
@@ -25,7 +27,7 @@ app.layout = html.Div([
         )
     ],
     style={'width': '20%', 'display': 'inline-block', 'margin-bottom': '20px'}),
-
+# slideer for filtering by number of deaths
     html.Div([
         html.Label('Deaths Reported'),
         dcc.Slider(
@@ -42,7 +44,7 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(id='deaths-by-date'),
     ],
-    style={'width': '95%'}),
+    style={'width': '85%'}),
 ])
 
 
@@ -65,9 +67,9 @@ def update_graph(deaths, state):
         traces.append(go.Scatter(
             x=df_by_state['date'],
             y=df_by_state['deaths'],
-            text=df_by_state['cases'],
+#           text=df_by_state['cases'],      # remove covid cases data
             mode='markers',
-            opacity=0.7,
+            opacity=0.6,
             marker={
                 'size': 15,
                 'line': {'width': 0.5, 'color': 'white'}
@@ -79,8 +81,8 @@ def update_graph(deaths, state):
         'data': traces,
         'layout': go.Layout(
             xaxis={'title': 'Date', 'titlefont': dict(size=18, color='darkgrey'), 'zeroline': False, 'ticks': 'outside'},
-            yaxis={'title': 'Deaths', 'titlefont': dict(size=18, color='darkgrey'), 'range': [000, 40000], 'ticks': 'outside'},
-            margin={'l': 60, 'b': 90, 't': 30, 'r': 20},
+            yaxis={'title': 'Total Deaths', 'titlefont': dict(size=18, color='darkgrey'), 'range': [000, 35000], 'ticks': 'outside'},
+            margin={'l': 60, 'b': 70, 't': 30, 'r': 20},
             legend={'x': 1, 'y': 1},
             hovermode='closest'
         )
