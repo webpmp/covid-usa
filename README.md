@@ -9,6 +9,7 @@ Covid-19 data visualization filtered by state.
 
 Covid-19 data provided by [The New York Times](https://github.com/nytimes/covid-19-data)<br/>
 Modified code from [dataviz.shef](http://dataviz.shef.ac.uk/tutorials/dash/)<br/>
+<br/>
 Issues with starting server:<br/>
 You already have a process bound to the default port (8000)<br/>
 Try:<br/>
